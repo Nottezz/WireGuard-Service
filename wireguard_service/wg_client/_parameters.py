@@ -20,7 +20,7 @@ class WGExecutable(enum.StrEnum):
 
 
 class WGArg:
-    def __init__(self, value, quotes: Quotes = Quotes.DOUBLE) -> None:
+    def __init__(self, value, quotes: Quotes = Quotes.NONE) -> None:
         self.value = value
         self.quotes = quotes
 
