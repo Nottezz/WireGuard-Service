@@ -35,11 +35,12 @@ class _WGCommandBase:
     ) -> None:
         self.prefix = WGPrefix(prefix or self.prefix)
         self.executable = WGExecutable(executable or self.executable)
-        self.options = WGOptionList(chain(self.options or [], options or []))
-        import itertools
+        self.options = WGOptionList(
+            self._normalize(chain(getattr(self, "options", []) or [], options or []))
+        )
 
         self.arguments = WGArgsList(
-            itertools.chain(self.arguments or [], arguments or [])
+            self._normalize(chain(self.arguments or [], arguments or []))
         )
 
     def execute(self, ssh_client: SSHClient) -> tuple[str, str]:
@@ -53,8 +54,16 @@ class _WGCommandBase:
         return stdout, stderr
 
     def _get_command(self) -> str:
-        command = self._COMMAND_TEMPLATE.format(self=self)
-        return " ".join(command.split())
+        parts = [
+            self.prefix,
+            self.executable,
+            *self.options,
+            *self.arguments,
+        ]
+        return " ".join(map(str, parts))
+
+    def _normalize(self, values):
+        return [str(v) for v in values if v is not None and v is not _NOT_SET]
 
 
 class WGCommand(_WGCommandBase):
