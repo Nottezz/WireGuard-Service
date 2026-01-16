@@ -16,11 +16,7 @@ _NOT_SET: Any = object()
 
 class _WGCommandBase:
 
-    _COMMAND_TEMPLATE = (
-        "{self.prefix} {self.executable}"  # todo: подумать по поводу t строки
-    )
-
-    prefix: WGPrefix | str = ""
+    prefix: WGPrefix | str = WGPrefix.SUDO
     executable: WGExecutable | str = "wg"
     options: WGOptionList | list[WGOption | str]
     arguments: WGArgsList = None
