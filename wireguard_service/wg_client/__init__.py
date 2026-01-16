@@ -1,1 +1,1 @@
-from _clients import WGClient
+from ._clients import WGClient

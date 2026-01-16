@@ -1,4 +1,4 @@
-from wireguard_service.wg_client._commands._base import _NOT_SET, WGCommand
+from wireguard_service.wg_client._commands._base import WGCommand
 
 
 class Show(WGCommand):
@@ -9,33 +9,33 @@ class Show(WGCommand):
 
     def __init__(
         self,
+        key: str,
         interface: str = "all",
-        public_key: str = _NOT_SET,
-        private_key: str = _NOT_SET,
-        listen_port: int = _NOT_SET,
-        peers: bool = _NOT_SET,
-        endpoints: bool = _NOT_SET,
-        latest_handshakes: bool = _NOT_SET,
         *,
+        public_key: bool = False,
+        private_key: bool = False,
+        listen_port: bool = False,
+        peers: bool = False,
+        endpoints: bool = False,
+        latest_handshakes: bool = False,
         options: list[str] | None = None,
     ):
-        arguments = []
-        if interface is not _NOT_SET:
-            arguments += [interface]
-        if public_key is not _NOT_SET:
-            arguments += [public_key]
-        if private_key is not _NOT_SET:
-            arguments += [private_key]
-        if listen_port is not _NOT_SET:
-            arguments += [listen_port]
-        if peers is not _NOT_SET:
-            arguments += ["peers"]
-        if endpoints is not _NOT_SET:
-            arguments += ["endpoints"]
-        if latest_handshakes is not _NOT_SET:
-            arguments += ["latest_handshakes"]
+        arguments = [key, interface]
+
+        if public_key:
+            arguments.append("public-key")
+        if private_key:
+            arguments.append("private-key")
+        if listen_port:
+            arguments.append("listen-port")
+        if peers:
+            arguments.append("peers")
+        if endpoints:
+            arguments.append("endpoints")
+        if latest_handshakes:
+            arguments.append("latest-handshakes")
 
         super().__init__(
             options=options,
-            arguments=arguments
+            arguments=arguments,
         )

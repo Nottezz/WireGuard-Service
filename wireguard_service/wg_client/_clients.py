@@ -1,13 +1,17 @@
 import paramiko
 from typing import Any
+
+from helpers import parse_wg_show
+from schemas.show import Interface
 from ._protocols import SSHClient
 
-from _commands import WGCommand, _NOT_SET, modules
+from ._commands import WGCommand, _NOT_SET, modules
 
 
 class WGClient:
     def __init__(self, ssh_client: SSHClient) -> None:
         self.ssh_client = ssh_client
+        self.options: list = []
 
     @classmethod
     def with_ssh(
@@ -35,15 +39,16 @@ class WGClient:
     def show(
         self,
         interface: str | None = None,
-        public_key: str = _NOT_SET,
-        private_key: str = _NOT_SET,
-        listen_port: int = _NOT_SET,
-        peers: bool = _NOT_SET,
-        endpoints: bool = _NOT_SET,
-        latest_handshakes: bool = _NOT_SET,
-    ) -> tuple[str, str]:
-        return self.exec(
+        public_key: bool = False,
+        private_key: bool = False,
+        listen_port: bool = False,
+        peers: bool = False,
+        endpoints: bool = False,
+        latest_handshakes: bool = False,
+    ) -> Interface:
+        stdout, stderr = self.exec(
             command=modules.show.Show(
+                "show",
                 interface=interface,
                 public_key=public_key,
                 private_key=private_key,
@@ -51,5 +56,9 @@ class WGClient:
                 peers=peers,
                 endpoints=endpoints,
                 latest_handshakes=latest_handshakes,
+                options=self.options,
             )
         )
+        if stderr:
+            raise RuntimeError(f"WG command failed: {stderr.strip()}")
+        return parse_wg_show(stdout)
