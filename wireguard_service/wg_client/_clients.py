@@ -63,14 +63,14 @@ class WGClient:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return parse_wg_show(stdout)
 
-    def genkey(self):
+    def genkey(self) -> str:
         stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
-        return stdout
+        return stdout.removesuffix("\n")
 
-    def genpsk(self):
+    def genpsk(self) -> str:
         stdout, stderr = self.exec(command=modules.generate_key.Genkey("genpsk"))
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
-        return stdout
+        return stdout.removesuffix("\n")
