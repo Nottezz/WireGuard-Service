@@ -1,1 +1,1 @@
-from . import show
+from . import show, generate_key
