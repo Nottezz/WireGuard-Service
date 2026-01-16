@@ -1,11 +1,11 @@
-import paramiko
 from typing import Any
+
+import paramiko
 
 from helpers import parse_wg_show
 from schemas.show import Interface
+from ._commands import WGCommand, modules
 from ._protocols import SSHClient
-
-from ._commands import WGCommand, _NOT_SET, modules
 
 
 class WGClient:
@@ -62,3 +62,15 @@ class WGClient:
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return parse_wg_show(stdout)
+
+    def genkey(self):
+        stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
+        if stderr:
+            raise RuntimeError(f"WG command failed: {stderr.strip()}")
+        return stdout
+
+    def genpsk(self):
+        stdout, stderr = self.exec(command=modules.generate_key.Genkey("genpsk"))
+        if stderr:
+            raise RuntimeError(f"WG command failed: {stderr.strip()}")
+        return stdout
