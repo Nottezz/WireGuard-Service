@@ -6,7 +6,7 @@ from ..dependencies import WGClientDepends
 
 router: APIRouter = APIRouter(
     prefix="/show",
-    tags=["show"],
+    tags=["Show configuration"],
 )
 
 @router.get("/")
