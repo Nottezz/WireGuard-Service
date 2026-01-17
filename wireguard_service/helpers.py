@@ -1,4 +1,6 @@
-from wireguard_service.schemas.show import Interface, Peer
+from wireguard_service.schemas.interface import Interface
+from schemas.peer import Peer
+
 
 def parse_wg_show(output: str) -> Interface:
     lines = output.splitlines()
@@ -23,11 +25,20 @@ def parse_wg_show(output: str) -> Interface:
         elif line.startswith("listening port:"):
             iface_data["listening_port"] = int(line.split(":", 1)[1].strip())
         elif line.startswith("peer:"):
+            if current_peer:
+                peers.append(current_peer)
             current_peer = {"public_key": line.split(":", 1)[1].strip()}
         elif current_peer is not None:
             key, val = line.split(":", 1)
             key = key.lower().replace(" ", "_")
-            current_peer[key] = val.strip()
+
+            # Обрабатываем allowed IPs как список
+            if key == "allowed_ips":
+                current_peer["allowed_ips"] = [
+                    ip.strip() for ip in val.strip().split(",") if ip.strip()
+                ]
+            else:
+                current_peer[key] = val.strip()
 
     if current_peer:
         peers.append(current_peer)
