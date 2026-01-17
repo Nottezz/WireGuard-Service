@@ -1,10 +1,12 @@
+from pathlib import Path
 from typing import Any
 
 import paramiko
 
 from helpers import parse_wg_show
-from schemas.show import Interface
+from schemas.interface import Interface
 from ._commands import WGCommand, modules
+from ._commands.modules.set import PeerConfig, Set
 from ._protocols import SSHClient
 
 
@@ -74,3 +76,42 @@ class WGClient:
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return stdout.removesuffix("\n")
+
+    def add_peer(
+        self,
+        interface: str,
+        public_key: str,
+        allowed_ips: list[str],
+        endpoint: str | None = None,
+        preshared_key_file: str | None = None,
+        persistent_keepalive: int | None = None,
+    ) -> None:
+
+        peer = PeerConfig(
+            public_key=public_key,
+            allowed_ips=allowed_ips,
+            endpoint=endpoint,
+            preshared_key_file=Path(preshared_key_file) if preshared_key_file else None,
+            persistent_keepalive=persistent_keepalive,
+        )
+
+        command = Set(interface, options=self.options).add_peer(peer)
+
+        stdout, stderr = self.exec(command)
+
+        if stderr:
+            raise RuntimeError(f"Failed to add peer: {stderr.strip()}")
+
+
+    def remove_peer_from_interface(
+        self,
+        interface: str,
+        public_key: str,
+    ) -> None:
+
+        stdout, stderr = self.exec(
+            Set(interface, options=self.options).remove_peer(public_key)
+        )
+
+        if stderr:
+            raise RuntimeError(f"Failed to remove peer: {stderr.strip()}")
