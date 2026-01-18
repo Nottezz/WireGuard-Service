@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-from .views.config_view import router as show_view
-from .views.generate_key import router as generate_key
+from .views import interfaces_router, peers_router, tools_router
+
 
 router = APIRouter(
     prefix="/api",
 )
-router.include_router(show_view)
-router.include_router(generate_key)
+router.include_router(interfaces_router)
+router.include_router(peers_router)
+router.include_router(tools_router)

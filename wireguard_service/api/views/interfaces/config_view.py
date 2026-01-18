@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends
 
-from schemas.show import Interface
-from ..dependencies import WGClientDepends
+from schemas.interface import Interface
+from api.dependencies import WGClientDepends
 
 
 router: APIRouter = APIRouter(
-    prefix="/show",
-    tags=["Show configuration"],
+    prefix="/show_config",
 )
 
 @router.get("/")

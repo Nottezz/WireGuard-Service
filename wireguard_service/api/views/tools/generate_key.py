@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from ..dependencies import WGClientDepends
+from api.dependencies import WGClientDepends
 
 router: APIRouter = APIRouter(
     prefix="/key",
