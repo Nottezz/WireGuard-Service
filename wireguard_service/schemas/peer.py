@@ -10,9 +10,11 @@ class PeerBase(BaseModel):
 
 
 class Peer(PeerBase):
-    latest_handshake: Optional[str] = None
-    transfer: Optional[str] = None
+    name: str | None = None # todo: подумать и сделать обязательным для заполнения
+    latest_handshake: str | None = None
+    transfer: str | None = None
 
 
 class AddPeer(PeerBase):
+    name: str
     persistent_keepalive: int | None = None
