@@ -61,14 +61,10 @@ class WGClient:
                 options=self.options,
             )
         )
-        if stderr:
-            raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return parse_wg_show(stdout)
 
     def genkey(self) -> str:
         stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
-        if stderr:
-            raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return stdout.removesuffix("\n")
 
     def genpsk(self) -> str:
@@ -96,12 +92,7 @@ class WGClient:
         )
 
         command = Set(interface, options=self.options).add_peer(peer)
-
-        stdout, stderr = self.exec(command)
-
-        if stderr:
-            raise RuntimeError(f"Failed to add peer: {stderr.strip()}")
-
+        self.exec(command)
 
     def remove_peer_from_interface(
         self,
@@ -109,9 +100,6 @@ class WGClient:
         public_key: str,
     ) -> None:
 
-        stdout, stderr = self.exec(
+        self.exec(
             Set(interface, options=self.options).remove_peer(public_key)
         )
-
-        if stderr:
-            raise RuntimeError(f"Failed to remove peer: {stderr.strip()}")

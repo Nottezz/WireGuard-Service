@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 
 _NOT_SET: Any = object()
 
+class WGError(Exception):
+    """"""
+
 
 class _WGCommandBase:
 
@@ -48,6 +51,8 @@ class _WGCommandBase:
         _, stdout, stderr = ssh_client.exec_command(command)
         stdout, stderr = stdout.read().decode(), stderr.read().decode()
 
+        stdout, stderr = self._check_errors(stdout, stderr)
+
         logger.info("Done executing command: %s", command)
         return stdout, stderr
 
@@ -62,6 +67,13 @@ class _WGCommandBase:
 
     def _normalize(self, values):
         return [str(v) for v in values if v is not None and v is not _NOT_SET]
+
+    def _check_errors(self, stdout: str, stderr: str) -> tuple[str, str]:
+        if stderr:
+            raise WGError('Error received. Output: \n%s, \n%s', stdout, stderr)
+
+        return stdout, stderr
+
 
 
 class WGCommand(_WGCommandBase):
