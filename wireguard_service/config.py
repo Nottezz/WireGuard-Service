@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 from pathlib import Path
-from pydantic import BaseModel
-from typing import Literal
+from pydantic import BaseModel, model_validator
+from typing import Literal, Self
 import logging
 
 
@@ -25,6 +25,32 @@ class SSHConfig(BaseModel):
     username: str
     password: str = ""
     kwargs: dict  = {}
+
+class RedisConnectionConfig(BaseModel):
+    host: str = "localhost"
+    port: int = 6379
+
+
+class RedisDatabaseConfig(BaseModel):
+    default: int = 0
+    users: int = 1
+
+    @model_validator(mode="after")
+    def validate_dbs_numbers_unique(self) -> Self:
+        db_value = list(self.model_dump().values())
+        if len(set(db_value)) != len(db_value):
+            raise ValueError("Database numbers must have unique values")
+        return self
+
+
+class RedisCollectionsNamesConfig(BaseModel):
+    user_set: str = "users"
+
+
+class RedisConfig(BaseModel):
+    connection: RedisConnectionConfig = RedisConnectionConfig()
+    db: RedisDatabaseConfig = RedisDatabaseConfig()
+    collections: RedisCollectionsNamesConfig = RedisCollectionsNamesConfig()
 
 
 class Settings(BaseSettings):
@@ -75,5 +101,6 @@ class Settings(BaseSettings):
 
     logging: LoggingConfig = LoggingConfig()
     ssh_config: SSHConfig
+    redis: RedisConfig = RedisConfig()
 
 settings = Settings()
