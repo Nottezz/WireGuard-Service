@@ -35,7 +35,7 @@ class DataBaseConfig(BaseModel):
     echo: bool = False
 
     @property
-    def database_url_asyncpg(self):
+    def database_url(self):
         return f"postgresql://{self.username}:{self.password}@{self.host}:{self.port}/{self.name}"
 
     naming_convention: dict[str, str] = {
