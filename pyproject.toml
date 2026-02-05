@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.18.3",
     "fastapi[standard]>=0.127.0",
     "paramiko>=4.0.0",
     "pydantic-settings>=2.12.0",
