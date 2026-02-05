@@ -5,7 +5,8 @@ from fastapi import Depends
 
 from wireguard_service.wg_client import WGClient
 from wireguard_service.config import Settings
-
+from sqlalchemy.orm import Session
+from wireguard_service.storages.database import get_db
 logger = logging.getLogger(__name__)
 
 def get_settings() -> Settings:
@@ -32,3 +33,4 @@ def wg_client(settings: Settings = Depends(get_settings)) -> WGClient:
 
 
 WGClientDepends = Annotated[WGClient, Depends(wg_client)]
+DateBaseDepends = Annotated[Session, Depends(get_db)]
