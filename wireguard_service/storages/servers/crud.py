@@ -10,7 +10,10 @@ from sqlalchemy.future import select
 logger = logging.getLogger(__name__)
 
 def add_server(db: Session, server_in: ServerCreate) -> ServerRead:
-    server = Server(**server_in.model_dump())
+    data = server_in.model_dump()
+    data["host"] = str(data["host"])
+
+    server = Server(**data)
     db.add(server)
     db.commit()
     db.refresh(server)
@@ -29,6 +32,11 @@ def get_list_servers(db: Session) -> list[ServerRead]:
 def get_server(db: Session, server_name: str) -> ServerRead:
     stmt = select(Server).where(Server.server_name == server_name)
     result = db.execute(stmt).scalar()
+
+    if not result:
+        logger.error("Server <%s> not found", server_name)
+        raise HTTPException(status_code=404, detail="Server <%s> not found" % server_name)
+
     return ServerRead.model_validate(result)
 
 def delete_server(db: Session, server_name: str) -> ServerRead:
