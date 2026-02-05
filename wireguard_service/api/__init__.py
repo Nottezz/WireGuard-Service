@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .views import interfaces_router, peers_router, tools_router, servers_router
+from .views import peers_router, tools_router, servers_router, interfaces_router
 
 
 router = APIRouter(
