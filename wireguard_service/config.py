@@ -26,6 +26,26 @@ class SSHConfig(BaseModel):
     password: str = ""
     kwargs: dict  = {}
 
+class DataBaseConfig(BaseModel):
+    host: str
+    port: int
+    username: str
+    password: str
+    name: str
+    echo: bool = False
+
+    @property
+    def database_url_asyncpg(self):
+        return f"postgresql://{self.username}:{self.password}@{self.host}:{self.port}/{self.name}"
+
+    naming_convention: dict[str, str] = {
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
+    }
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -75,5 +95,6 @@ class Settings(BaseSettings):
 
     logging: LoggingConfig = LoggingConfig()
     ssh_config: SSHConfig
+    database: DataBaseConfig
 
 settings = Settings()
