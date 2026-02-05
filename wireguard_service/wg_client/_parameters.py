@@ -1,7 +1,6 @@
 import enum
 from typing import Any, Iterable
 
-from click import option
 
 
 class Quotes(enum.Enum):

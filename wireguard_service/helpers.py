@@ -1,5 +1,5 @@
 from wireguard_service.schemas.interface import Interface
-from schemas.peer import Peer
+from wireguard_service.schemas.peer import Peer
 
 
 def parse_wg_show(output: str) -> Interface:

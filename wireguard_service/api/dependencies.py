@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from wg_client import WGClient
+from wireguard_service.wg_client import WGClient
 from wireguard_service.config import Settings
 
 logger = logging.getLogger(__name__)

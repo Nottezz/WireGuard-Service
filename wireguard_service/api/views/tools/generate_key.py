@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.dependencies import WGClientDepends
+from wireguard_service.api.dependencies import WGClientDepends
 
 router: APIRouter = APIRouter(
     prefix="/key",

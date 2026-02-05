@@ -3,8 +3,8 @@ from typing import Any
 
 import paramiko
 
-from helpers import parse_wg_show
-from schemas.interface import Interface
+from wireguard_service.helpers import parse_wg_show
+from wireguard_service.schemas.interface import Interface
 from ._commands import WGCommand, modules
 from ._commands.modules.set import PeerConfig, Set
 from ._protocols import SSHClient

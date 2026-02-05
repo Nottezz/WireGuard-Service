@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from schemas.peer import AddPeer
-from api.dependencies import WGClientDepends
+from wireguard_service.schemas.peer import AddPeer
+from wireguard_service.api.dependencies import WGClientDepends
 
 router: APIRouter = APIRouter(
     prefix="/{interface}",
