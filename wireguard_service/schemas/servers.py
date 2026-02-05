@@ -18,7 +18,7 @@ class ServerUpdate(ServerBase):
     Schema for server update
     """
 
-class Server(ServerBase):
+class ServerRead(ServerBase):
     """
     Schema for read server information
     """
