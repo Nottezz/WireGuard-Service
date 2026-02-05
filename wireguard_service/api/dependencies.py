@@ -1,33 +1,39 @@
 import logging
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Path
 
 from wireguard_service.wg_client import WGClient
 from wireguard_service.config import Settings
 from sqlalchemy.orm import Session
 from wireguard_service.storages.database import get_db
+from wireguard_service.storages.servers import get_server
+
 logger = logging.getLogger(__name__)
+
 
 def get_settings() -> Settings:
     return Settings()
 
 
-def wg_client(settings: Settings = Depends(get_settings)) -> WGClient:
+def wg_client(
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+    server_name: str = Path(...),
+) -> WGClient:
+    server = get_server(db, server_name)
     ssh_kwargs = settings.ssh_config.kwargs
-    username = settings.ssh_config.username
-    password = settings.ssh_config.password
-    if password:
-        ssh_kwargs["password"] = password
 
     ssh_args = {
-        "host": settings.ssh_config.host,
-        "port": settings.ssh_config.port,
-        "username": username,
+        "host": str(server.host),
+        "port": server.port,
+        "username": server.username,
         "ssh_extra_kwargs": ssh_kwargs,
     }
+    logger.debug("SSH information: %s", ssh_args)
     logger.info(
-        "Connecting: %s@%s:%s" % (username, settings.ssh_config.host, settings.ssh_config.port)
+        "Connecting: %s@%s:%s"
+        % (server.username, server.host, server.port)
     )
     return WGClient.with_ssh(**ssh_args)
 
