@@ -1,4 +1,4 @@
-from pydantic import BaseModel, IPvAnyAddress
+from pydantic import BaseModel, IPvAnyAddress, ConfigDict
 from annotated_types import Len
 from typing import Annotated
 
@@ -7,6 +7,8 @@ class ServerBase(BaseModel):
     port: int
     username: str
     server_name: Annotated[str, Len(min_length=5, max_length=100)]
+
+    model_config = ConfigDict(from_attributes=True)
 
 class ServerCreate(ServerBase):
     """
