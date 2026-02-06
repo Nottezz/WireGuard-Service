@@ -18,12 +18,12 @@ class WGClient:
 
     @classmethod
     def with_ssh(
-        cls,
-        host: str,
-        port: int,
-        username: str,
-        key_filename: str | None = None,
-        ssh_extra_kwargs: dict[str, Any] | None = None,
+            cls,
+            host: str,
+            port: int,
+            username: str,
+            key_filename: str | None = None,
+            ssh_extra_kwargs: dict[str, Any] | None = None,
     ) -> "WGClient":
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -66,14 +66,14 @@ class WGClient:
         return command.execute(self.ssh_client)
 
     def show(
-        self,
-        interface: str | None = None,
-        public_key: bool = False,
-        private_key: bool = False,
-        listen_port: bool = False,
-        peers: bool = False,
-        endpoints: bool = False,
-        latest_handshakes: bool = False,
+            self,
+            interface: str | None = None,
+            public_key: bool = False,
+            private_key: bool = False,
+            listen_port: bool = False,
+            peers: bool = False,
+            endpoints: bool = False,
+            latest_handshakes: bool = False,
     ) -> Interface:
         stdout, stderr = self.exec(
             command=modules.show.Show(
@@ -90,43 +90,67 @@ class WGClient:
         )
         return parse_wg_show(stdout)
 
-    def genkey(self) -> str:
+    def generate_private_key(self) -> str:
         stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
         return stdout.removesuffix("\n")
 
-    def genpsk(self) -> str:
-        stdout, stderr = self.exec(command=modules.generate_key.Genkey("genpsk"))
+    def generate_public_key(self, private_key: str) -> str:
+        stdout, stderr = self.exec(command=modules.generate_key.Genkey("pubkey"), stdin=private_key)
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return stdout.removesuffix("\n")
 
-    def add_peer(
-        self,
-        interface: str,
-        public_key: str,
-        allowed_ips: list[str],
-        endpoint: str | None = None,
-        preshared_key_file: str | None = None,
-        persistent_keepalive: int | None = None,
-    ) -> None:
+    def gen_keypair(self) -> tuple[str, str]:
+        """
+        Returns: (private_key, public_key)
+        """
+        # 1. private key
+        private_key = self.generate_private_key()
+
+        # 2. public key from private
+        stdout, stderr = self.exec(
+            command=modules.generate_key.Genkey(
+                "pubkey",
+                stdin=private_key,
+            )
+        )
+        if stderr:
+            raise RuntimeError(f"wg pubkey failed: {stderr.strip()}")
+
+        public_key = stdout.strip()
+
+        return private_key, public_key
+
+    def add_peer_with_keys(
+            self,
+            interface: str,
+            allowed_ips: list[str],
+            endpoint: str | None = None,
+            persistent_keepalive: int | None = None,
+    ) -> dict:
+        private_key, public_key = self.gen_keypair()
 
         peer = PeerConfig(
             public_key=public_key,
             allowed_ips=allowed_ips,
             endpoint=endpoint,
-            preshared_key_file=Path(preshared_key_file) if preshared_key_file else None,
             persistent_keepalive=persistent_keepalive,
         )
 
         command = Set(interface, options=self.options).add_peer(peer)
         self.exec(command)
 
-    def remove_peer_from_interface(
-        self,
-        interface: str,
-        public_key: str,
-    ) -> None:
+        return {
+            "private_key": private_key,
+            "public_key": public_key,
+        }
 
+    def remove_peer_from_interface(
+            self,
+            interface: str,
+            public_key: str,
+    ) -> dict[str, str]:
         self.exec(
             Set(interface, options=self.options).remove_peer(public_key)
         )
+        return {"status": "success", "message": f"Peer <{public_key}> removed from interface"}
