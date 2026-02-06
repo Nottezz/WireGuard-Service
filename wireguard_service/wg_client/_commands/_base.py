@@ -25,6 +25,7 @@ class _WGCommandBase:
     executable: WGExecutable | str = "wg"
     options: WGOptionList | list[WGOption | str]
     arguments: WGArgsList = None
+    stdin: str | None = None
 
     def __init__(
         self,
@@ -33,9 +34,11 @@ class _WGCommandBase:
         executable: WGExecutable = None,
         options: list[str] | None = None,
         arguments: list[str] | None = None,
+        stdin: str | None = None,
     ) -> None:
         self.prefix = WGPrefix(prefix or self.prefix)
         self.executable = WGExecutable(executable or self.executable)
+        self.stdin = stdin
         self.options = WGOptionList(
             self._normalize(chain(getattr(self, "options", []) or [], options or []))
         )
@@ -48,8 +51,17 @@ class _WGCommandBase:
         command = self._get_command()
         logger.info("Executing command: %s", command)
 
-        _, stdout, stderr = ssh_client.exec_command(command)
+        stdin_stream, stdout, stderr = ssh_client.exec_command(command)
+
+        if self.stdin:
+            stdin_stream.write(self.stdin)
+            stdin_stream.flush()
+            stdin_stream.channel.shutdown_write()
+
         stdout, stderr = stdout.read().decode(), stderr.read().decode()
+
+        logger.debug("stdout: %s", stdout)
+        logger.debug("stderr: %s", stderr)
 
         stdout, stderr = self._check_errors(stdout, stderr)
 
