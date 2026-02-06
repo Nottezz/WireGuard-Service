@@ -16,6 +16,7 @@ class WGPrefix(enum.StrEnum):
 
 class WGExecutable(enum.StrEnum):
     WG = "wg"
+    WG_QUICK = "wg-quick"
 
 
 class WGArg:

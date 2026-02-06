@@ -81,7 +81,7 @@ class _WGCommandBase:
         return [str(v) for v in values if v is not None and v is not _NOT_SET]
 
     def _check_errors(self, stdout: str, stderr: str) -> tuple[str, str]:
-        if stderr:
+        if stderr and not stderr.startswith("[#]"):
             raise WGError('Error received. Output: \n%s, \n%s', stdout, stderr)
 
         return stdout, stderr
