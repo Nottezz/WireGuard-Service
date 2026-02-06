@@ -90,6 +90,10 @@ class WGClient:
         )
         return parse_wg_show(stdout)
 
+    def save_changes(self, interface: str = "all") -> tuple[str, str]:
+        stdout, stderr = self.exec(command=modules.save.WGQuickSave(interface))
+        return stdout, stderr
+
     def generate_private_key(self) -> str:
         stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
         return stdout.removesuffix("\n")
@@ -139,6 +143,7 @@ class WGClient:
 
         command = Set(interface, options=self.options).add_peer(peer)
         self.exec(command)
+        self.save_changes(interface=interface)
 
         return {
             "private_key": private_key,
@@ -153,4 +158,5 @@ class WGClient:
         self.exec(
             Set(interface, options=self.options).remove_peer(public_key)
         )
+        self.save_changes(interface=interface)
         return {"status": "success", "message": f"Peer <{public_key}> removed from interface"}
