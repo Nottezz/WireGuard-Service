@@ -4,7 +4,7 @@ from ..dependencies import DateBaseDepends
 from wireguard_service.actions import get_client_config
 
 router = APIRouter(
-    prefix="/{server_name}/client_config",
+    prefix="/client_config/{server_name}",
     tags=["Client config"]
 )
 
