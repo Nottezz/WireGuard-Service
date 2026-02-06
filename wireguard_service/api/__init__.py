@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from .views import servers_router, interfaces_router, peers_router, client_config_router
-
+from .views import (client_config_router, interfaces_router, peers_router,
+                    servers_router)
 
 router = APIRouter(
     prefix="/api",

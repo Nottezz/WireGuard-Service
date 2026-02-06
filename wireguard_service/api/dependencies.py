@@ -2,12 +2,12 @@ import logging
 from typing import Annotated
 
 from fastapi import Depends, Path
-
-from wireguard_service.wg_client import WGClient
-from wireguard_service.config import Settings
 from sqlalchemy.orm import Session
+
+from wireguard_service.config import Settings
 from wireguard_service.storages.database import get_db
 from wireguard_service.storages.servers import get_server
+from wireguard_service.wg_client import WGClient
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +31,7 @@ def wg_client(
         "ssh_extra_kwargs": ssh_kwargs,
     }
     logger.debug("SSH information: %s", ssh_args)
-    logger.info(
-        "Connecting: %s@%s:%s"
-        % (server.username, server.host, server.port)
-    )
+    logger.info("Connecting: %s@%s:%s" % (server.username, server.host, server.port))
     return WGClient.with_ssh(**ssh_args)
 
 

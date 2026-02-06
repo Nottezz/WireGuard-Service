@@ -2,7 +2,6 @@ import enum
 from typing import Any, Iterable
 
 
-
 class Quotes(enum.Enum):
     NONE = 0
     SINGLE = 1

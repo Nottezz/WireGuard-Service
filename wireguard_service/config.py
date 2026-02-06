@@ -1,11 +1,13 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
-from pathlib import Path
-from pydantic import BaseModel
-from typing import Literal
 import logging
+from pathlib import Path
+from typing import Literal
 
+from pydantic import BaseModel
+from pydantic_settings import (BaseSettings, PydanticBaseSettingsSource,
+                               SettingsConfigDict, YamlConfigSettingsSource)
 
 BASE_DIR = Path(__file__).resolve().parent
+
 
 class LoggingConfig(BaseModel):
     log_format: str = (
@@ -20,7 +22,8 @@ class LoggingConfig(BaseModel):
 
 
 class SSHConfig(BaseModel):
-    kwargs: dict  = {}
+    kwargs: dict = {}
+
 
 class DataBaseConfig(BaseModel):
     host: str
@@ -92,5 +95,6 @@ class Settings(BaseSettings):
     logging: LoggingConfig = LoggingConfig()
     ssh_config: SSHConfig
     database: DataBaseConfig
+
 
 settings = Settings()

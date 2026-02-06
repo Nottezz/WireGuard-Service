@@ -6,6 +6,7 @@ import paramiko
 
 from wireguard_service.helpers import parse_wg_show
 from wireguard_service.schemas.interface import Interface
+
 from ._commands import WGCommand, modules
 from ._commands.modules.set import PeerConfig, Set
 from ._protocols import SSHClient
@@ -18,12 +19,12 @@ class WGClient:
 
     @classmethod
     def with_ssh(
-            cls,
-            host: str,
-            port: int,
-            username: str,
-            key_filename: str | None = None,
-            ssh_extra_kwargs: dict[str, Any] | None = None,
+        cls,
+        host: str,
+        port: int,
+        username: str,
+        key_filename: str | None = None,
+        ssh_extra_kwargs: dict[str, Any] | None = None,
     ) -> "WGClient":
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -38,12 +39,12 @@ class WGClient:
 
     @classmethod
     def check_connection(
-            cls,
-            host: str,
-            port: int,
-            username: str,
-            key_filename: str | None = None,
-            ssh_extra_kwargs: dict[str, Any] | None = None,
+        cls,
+        host: str,
+        port: int,
+        username: str,
+        key_filename: str | None = None,
+        ssh_extra_kwargs: dict[str, Any] | None = None,
     ) -> bool:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -66,14 +67,14 @@ class WGClient:
         return command.execute(self.ssh_client)
 
     def show(
-            self,
-            interface: str | None = None,
-            public_key: bool = False,
-            private_key: bool = False,
-            listen_port: bool = False,
-            peers: bool = False,
-            endpoints: bool = False,
-            latest_handshakes: bool = False,
+        self,
+        interface: str | None = None,
+        public_key: bool = False,
+        private_key: bool = False,
+        listen_port: bool = False,
+        peers: bool = False,
+        endpoints: bool = False,
+        latest_handshakes: bool = False,
     ) -> Interface:
         stdout, stderr = self.exec(
             command=modules.show.Show(
@@ -99,7 +100,9 @@ class WGClient:
         return stdout.removesuffix("\n")
 
     def generate_public_key(self, private_key: str) -> str:
-        stdout, stderr = self.exec(command=modules.generate_key.Genkey("pubkey"), stdin=private_key)
+        stdout, stderr = self.exec(
+            command=modules.generate_key.Genkey("pubkey"), stdin=private_key
+        )
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
         return stdout.removesuffix("\n")
@@ -126,11 +129,11 @@ class WGClient:
         return private_key, public_key
 
     def add_peer_with_keys(
-            self,
-            interface: str,
-            allowed_ips: list[str],
-            endpoint: str | None = None,
-            persistent_keepalive: int | None = None,
+        self,
+        interface: str,
+        allowed_ips: list[str],
+        endpoint: str | None = None,
+        persistent_keepalive: int | None = None,
     ) -> dict:
         private_key, public_key = self.gen_keypair()
 
@@ -151,12 +154,13 @@ class WGClient:
         }
 
     def remove_peer_from_interface(
-            self,
-            interface: str,
-            public_key: str,
+        self,
+        interface: str,
+        public_key: str,
     ) -> dict[str, str]:
-        self.exec(
-            Set(interface, options=self.options).remove_peer(public_key)
-        )
+        self.exec(Set(interface, options=self.options).remove_peer(public_key))
         self.save_changes(interface=interface)
-        return {"status": "success", "message": f"Peer <{public_key}> removed from interface"}
+        return {
+            "status": "success",
+            "message": f"Peer <{public_key}> removed from interface",
+        }

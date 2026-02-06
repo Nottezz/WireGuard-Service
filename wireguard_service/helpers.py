@@ -1,7 +1,7 @@
-from wireguard_service.schemas.servers import ServerRead
+from wireguard_service.jinja2_templates import templates
 from wireguard_service.schemas.interface import Interface
 from wireguard_service.schemas.peer import Peer
-from wireguard_service.jinja2_templates import templates
+from wireguard_service.schemas.servers import ServerRead
 
 
 def parse_wg_show(output: str) -> Interface:
@@ -47,6 +47,7 @@ def parse_wg_show(output: str) -> Interface:
 
     return Interface(peers=[Peer(**p) for p in peers], **iface_data)
 
+
 def camel_case_to_snake_case(input_str: str) -> str:
     """
     >>> camel_case_to_snake_case("SomeSDK")
@@ -74,7 +75,12 @@ def camel_case_to_snake_case(input_str: str) -> str:
         chars.append(char.lower())
     return "".join(chars)
 
-def render_client_config(server: ServerRead, client_private_key: str, client_address: str,) -> str:
+
+def render_client_config(
+    server: ServerRead,
+    client_private_key: str,
+    client_address: str,
+) -> str:
     template = templates.get_template("client_template.config")
     context = {
         "client_private_key": client_private_key,

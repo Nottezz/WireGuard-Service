@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Self
+
 from .._base import WGCommand
 
 
@@ -83,7 +84,6 @@ class Set(WGCommand):
             args.extend(peer.to_args())
 
         return args
-
 
     def execute(self, ssh_client):
         arguments = self._build_arguments()

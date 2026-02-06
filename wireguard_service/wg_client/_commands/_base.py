@@ -2,18 +2,15 @@ import logging
 from itertools import chain
 from typing import Any
 
-from wireguard_service.wg_client._parameters import (
-    WGArgsList,
-    WGExecutable,
-    WGOption,
-    WGOptionList,
-    WGPrefix,
-)
+from wireguard_service.wg_client._parameters import (WGArgsList, WGExecutable,
+                                                     WGOption, WGOptionList,
+                                                     WGPrefix)
 from wireguard_service.wg_client._protocols import SSHClient
 
 logger = logging.getLogger(__name__)
 
 _NOT_SET: Any = object()
+
 
 class WGError(Exception):
     """"""
@@ -82,10 +79,9 @@ class _WGCommandBase:
 
     def _check_errors(self, stdout: str, stderr: str) -> tuple[str, str]:
         if stderr and not stderr.startswith("[#]"):
-            raise WGError('Error received. Output: \n%s, \n%s', stdout, stderr)
+            raise WGError("Error received. Output: \n%s, \n%s", stdout, stderr)
 
         return stdout, stderr
-
 
 
 class WGCommand(_WGCommandBase):

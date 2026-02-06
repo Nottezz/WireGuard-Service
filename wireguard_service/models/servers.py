@@ -1,8 +1,10 @@
-from .base import Base
 import uuid
-from sqlalchemy.orm import Mapped, mapped_column
+
+from sqlalchemy import String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import func, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from .base import Base
 
 
 class Server(Base):
