@@ -4,12 +4,12 @@ from pydantic import BaseModel
 
 
 class PeerBase(BaseModel):
-    public_key: str
     endpoint: str | None = None
     allowed_ips: list[str]
 
 
 class Peer(PeerBase):
+    public_key: str
     latest_handshake: Optional[str] = None
     transfer: Optional[str] = None
 
