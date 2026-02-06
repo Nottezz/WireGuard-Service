@@ -1,3 +1,4 @@
+import socket
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +35,32 @@ class WGClient:
             **(ssh_extra_kwargs or {}),
         )
         return cls(ssh)
+
+    @classmethod
+    def check_connection(
+            cls,
+            host: str,
+            port: int,
+            username: str,
+            key_filename: str | None = None,
+            ssh_extra_kwargs: dict[str, Any] | None = None,
+    ) -> bool:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            ssh.connect(
+                hostname=host,
+                port=port,
+                username=username,
+                key_filename=key_filename,
+                timeout=5,
+                **(ssh_extra_kwargs or {}),
+            )
+            return True
+        except (paramiko.AuthenticationException, paramiko.SSHException, socket.error):
+            return False
+        finally:
+            ssh.close()
 
     def exec(self, command: WGCommand) -> tuple[str, str]:
         return command.execute(self.ssh_client)
