@@ -20,10 +20,6 @@ class LoggingConfig(BaseModel):
 
 
 class SSHConfig(BaseModel):
-    host: str
-    port: int
-    username: str
-    password: str = ""
     kwargs: dict  = {}
 
 class DataBaseConfig(BaseModel):
