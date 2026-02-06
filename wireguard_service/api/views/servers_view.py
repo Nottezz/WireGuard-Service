@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from wireguard_service.schemas import ServerRead, ServerCreate
+from wireguard_service.schemas import ServerRead, ServerCreate, ServerUpdate
 from wireguard_service.storages import servers
 from ..dependencies import DateBaseDepends, WGClientDepends
 
@@ -25,6 +25,10 @@ def check_server_connection(db: DateBaseDepends, server_name: str, wg_client: WG
 @router.post("/")
 def create_server(db: DateBaseDepends, server_in: ServerCreate) -> ServerRead:
     return servers.add_server(db, server_in)
+
+@router.patch("/{server_name}")
+def partial_update_server(db: DateBaseDepends, server_in: ServerUpdate, server_name: str) -> ServerRead:
+    return servers.partial_update_server_info(db, server_in, server_name=server_name)
 
 @router.delete("/{server_name}")
 def delete_server(db: DateBaseDepends, server_name: str) -> ServerRead:

@@ -39,6 +39,25 @@ def get_server(db: Session, server_name: str) -> ServerRead:
 
     return ServerRead.model_validate(result)
 
+def partial_update_server_info(db: Session, server_update: ServerUpdate, server_name: str) -> ServerRead:
+    stmt = select(Server).where(Server.server_name == server_name)
+    server = db.execute(stmt).scalar()
+
+    if not server:
+        logger.error("Server <%s> not found", server_name)
+        raise HTTPException(status_code=404, detail="Server <%s> not found" % server_name)
+
+    for field, value in server_update.model_dump(exclude_unset=True).items():
+        setattr(server, field, value)
+
+    db.commit()
+    db.refresh(server)
+
+    logging.info("Server <%s> will be updated", server.server_name)
+
+    return ServerRead.model_validate(server)
+
+
 def delete_server(db: Session, server_name: str) -> ServerRead:
     result = db.execute(select(Server).where(Server.server_name == server_name))
     server = result.scalars().first()
