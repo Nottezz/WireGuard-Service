@@ -1,5 +1,5 @@
-from wireguard_service.wg_client._commands._base import WGCommand
-from wireguard_service.wg_client._parameters import WGExecutable
+from wireguard_service.infrastructure.wg_client._commands._base import WGCommand
+from wireguard_service.infrastructure.wg_client._parameters import WGExecutable
 
 
 class WGQuickSave(WGCommand):
