@@ -59,7 +59,7 @@ class Settings(BaseSettings):
             BASE_DIR / "config.default.yaml",
             BASE_DIR / "config.local.yaml",
         ),
-        yaml_config_section="wg_client",
+        yaml_config_section="wireguard",
     )
 
     @classmethod
