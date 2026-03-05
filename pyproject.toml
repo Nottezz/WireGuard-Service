@@ -26,5 +26,9 @@ dev = [
 target-version = ["py313"]
 line-length = 88
 
+[tool.isort]
+profile = "black"
+
+
 [tool.mypy]
 python_version = "3.13"
