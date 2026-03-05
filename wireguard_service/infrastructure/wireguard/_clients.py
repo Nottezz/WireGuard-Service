@@ -1,5 +1,4 @@
 import socket
-from pathlib import Path
 from typing import Any
 
 import paramiko
@@ -7,7 +6,7 @@ import paramiko
 from wireguard_service.helpers import parse_wg_show
 from wireguard_service.schemas.interface import Interface
 
-from ._commands import WGCommand, modules
+from ._commands import WGCommand
 from ._commands.modules.set import PeerConfig, Set
 from ._protocols import SSHClient
 
@@ -77,7 +76,7 @@ class WGClient:
         latest_handshakes: bool = False,
     ) -> Interface:
         stdout, stderr = self.exec(
-            command=modules.show.Show(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.show.Show(
                 "show",
                 interface=interface,
                 public_key=public_key,
@@ -92,16 +91,27 @@ class WGClient:
         return parse_wg_show(stdout)
 
     def save_changes(self, interface: str = "all") -> tuple[str, str]:
-        stdout, stderr = self.exec(command=modules.save.WGQuickSave(interface))
+        stdout, stderr = self.exec(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.save.WGQuickSave(
+                interface
+            )
+        )
         return stdout, stderr
 
     def generate_private_key(self) -> str:
-        stdout, stderr = self.exec(command=modules.generate_key.Genkey("genkey"))
+        stdout, stderr = self.exec(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
+                "genkey"
+            )
+        )
         return stdout.removesuffix("\n")
 
     def generate_public_key(self, private_key: str) -> str:
         stdout, stderr = self.exec(
-            command=modules.generate_key.Genkey("pubkey"), stdin=private_key
+            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
+                "pubkey"
+            ),
+            stdin=private_key,
         )
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
@@ -116,7 +126,7 @@ class WGClient:
 
         # 2. public key from private
         stdout, stderr = self.exec(
-            command=modules.generate_key.Genkey(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
                 "pubkey",
                 stdin=private_key,
             )
