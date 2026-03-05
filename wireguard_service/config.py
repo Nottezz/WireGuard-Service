@@ -3,8 +3,12 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel
-from pydantic_settings import (BaseSettings, PydanticBaseSettingsSource,
-                               SettingsConfigDict, YamlConfigSettingsSource)
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    YamlConfigSettingsSource,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 
