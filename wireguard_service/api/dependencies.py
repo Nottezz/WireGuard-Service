@@ -5,9 +5,9 @@ from fastapi import Depends, Path
 from sqlalchemy.orm import Session
 
 from wireguard_service.config import Settings
+from wireguard_service.infrastructure.wireguard import WGClient
 from wireguard_service.storages.database import get_db
 from wireguard_service.storages.servers import get_server
-from wireguard_service.infrastructure.wireguard import WGClient
 
 logger = logging.getLogger(__name__)
 

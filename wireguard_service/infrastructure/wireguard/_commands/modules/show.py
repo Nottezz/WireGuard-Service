@@ -1,4 +1,5 @@
-from wireguard_service.infrastructure.wireguard._commands._base import WGCommand
+from wireguard_service.infrastructure.wireguard._commands._base import \
+    WGCommand
 
 
 class Show(WGCommand):

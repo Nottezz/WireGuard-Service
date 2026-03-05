@@ -91,16 +91,27 @@ class WGClient:
         return parse_wg_show(stdout)
 
     def save_changes(self, interface: str = "all") -> tuple[str, str]:
-        stdout, stderr = self.exec(command=wireguard_service.infrastructure.wg_client._commands.modules.save.WGQuickSave(interface))
+        stdout, stderr = self.exec(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.save.WGQuickSave(
+                interface
+            )
+        )
         return stdout, stderr
 
     def generate_private_key(self) -> str:
-        stdout, stderr = self.exec(command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey("genkey"))
+        stdout, stderr = self.exec(
+            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
+                "genkey"
+            )
+        )
         return stdout.removesuffix("\n")
 
     def generate_public_key(self, private_key: str) -> str:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey("pubkey"), stdin=private_key
+            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
+                "pubkey"
+            ),
+            stdin=private_key,
         )
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
