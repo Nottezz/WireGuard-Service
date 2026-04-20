@@ -4,6 +4,7 @@ from typing import Any
 import paramiko
 
 from wireguard_service.helpers import parse_wg_show
+from wireguard_service.infrastructure.wireguard import _commands
 from wireguard_service.schemas.interface import Interface
 
 from ._commands import WGCommand
@@ -76,7 +77,7 @@ class WGClient:
         latest_handshakes: bool = False,
     ) -> Interface:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.show.Show(
+            command=_commands.modules.show.Show(
                 "show",
                 interface=interface,
                 public_key=public_key,
@@ -92,25 +93,19 @@ class WGClient:
 
     def save_changes(self, interface: str = "all") -> tuple[str, str]:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.save.WGQuickSave(
-                interface
-            )
+            command=_commands.modules.save.WGQuickSave(interface)
         )
         return stdout, stderr
 
     def generate_private_key(self) -> str:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
-                "genkey"
-            )
+            command=_commands.modules.generate_key.Genkey("genkey")
         )
         return stdout.removesuffix("\n")
 
     def generate_public_key(self, private_key: str) -> str:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
-                "pubkey"
-            ),
+            command=_commands.modules.generate_key.Genkey("pubkey"),
             stdin=private_key,
         )
         if stderr:
@@ -126,7 +121,7 @@ class WGClient:
 
         # 2. public key from private
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
+            command=_commands.modules.generate_key.Genkey(
                 "pubkey",
                 stdin=private_key,
             )
