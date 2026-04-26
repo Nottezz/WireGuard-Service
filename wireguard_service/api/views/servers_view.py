@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from infrastructure.wireguard import WGClient
 
 from wireguard_service.schemas import ServerCreate, ServerRead, ServerUpdate
 from wireguard_service.storages import servers
@@ -22,11 +23,15 @@ def get_server(db: DateBaseDepends, server_name: str) -> ServerRead:
 
 
 @router.get("/{server_name}/check")
-def check_server_connection(
-    db: DateBaseDepends, server_name: str, wg_client: WGClientDepends
-) -> bool:
+def check_server_connection(db: DateBaseDepends, server_name: str) -> bool:
     server = servers.get_server(db, server_name)
-    return wg_client.check_connection(str(server.host), server.port, server.username)
+    return WGClient.check_connection(
+        host=str(server.host),
+        port=server.port,
+        username=server.username,
+        key_filename=server.key_filename,
+        passphrase=server.passphrase,
+    )
 
 
 @router.post("/{server_name}")

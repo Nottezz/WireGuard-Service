@@ -28,6 +28,8 @@ def wg_client(
         "host": str(server.host),
         "port": server.port,
         "username": server.username,
+        "key_filename": server.key_filename,
+        "passphrase": server.passphrase,
         "ssh_extra_kwargs": ssh_kwargs,
     }
     logger.debug("SSH information: %s", ssh_args)
