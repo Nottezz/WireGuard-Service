@@ -8,10 +8,11 @@ from ..dependencies import DateBaseDepends, WGClientDepends
 router = APIRouter(prefix="/client_config/{server_name}", tags=["Client config"])
 
 
-@router.get("/render")
+@router.post("/render")
 def render_client_config(
     db: DateBaseDepends,
     wg_client: WGClientDepends,
+    server_name: str,
     client_config: ClientConfig,
 ):
-    return get_client_config(db, wg_client, **client_config.model_dump())
+    return get_client_config(db, wg_client, server_name, **client_config.model_dump())

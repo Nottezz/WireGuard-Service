@@ -22,7 +22,6 @@ def wg_client(
     server_name: str = Path(...),
 ) -> WGClient:
     server = get_server(db, server_name)
-    ssh_kwargs = settings.ssh_config.kwargs
 
     ssh_args = {
         "host": str(server.host),
@@ -30,7 +29,6 @@ def wg_client(
         "username": server.username,
         "key_filename": server.key_filename,
         "passphrase": server.passphrase,
-        "ssh_extra_kwargs": ssh_kwargs,
     }
     logger.debug("SSH information: %s", ssh_args)
     logger.info("Connecting: %s@%s:%s" % (server.username, server.host, server.port))

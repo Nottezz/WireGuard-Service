@@ -98,7 +98,6 @@ class Settings(BaseSettings):
         )
 
     logging: LoggingConfig = LoggingConfig()
-    ssh_config: SSHConfig
     database: DataBaseConfig
 
 
