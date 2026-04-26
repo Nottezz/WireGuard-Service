@@ -11,6 +11,7 @@ from pydantic_settings import (
 )
 
 BASE_DIR = Path(__file__).resolve().parent
+TEMPLATE_DIR = BASE_DIR / "templates"
 
 
 class LoggingConfig(BaseModel):

@@ -18,3 +18,5 @@ class Server(Base):
     username: Mapped[str] = mapped_column(nullable=False)
     server_name: Mapped[str] = mapped_column(String(100), nullable=False)
     public_key: Mapped[str] = mapped_column(nullable=True)
+    key_filename: Mapped[str | None] = mapped_column(nullable=True)
+    passphrase: Mapped[str | None] = mapped_column(nullable=True)

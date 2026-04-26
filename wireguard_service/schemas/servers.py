@@ -9,6 +9,8 @@ class ServerBase(BaseModel):
     port: int
     username: str
     server_name: Annotated[str, Len(min_length=5, max_length=100)]
+    key_filename: str | None = None
+    passphrase: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

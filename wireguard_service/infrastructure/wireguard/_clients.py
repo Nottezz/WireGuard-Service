@@ -4,6 +4,7 @@ from typing import Any
 import paramiko
 
 from wireguard_service.helpers import parse_wg_show
+from wireguard_service.infrastructure.wireguard import _commands
 from wireguard_service.schemas.interface import Interface
 
 from ._commands import WGCommand
@@ -23,6 +24,7 @@ class WGClient:
         port: int,
         username: str,
         key_filename: str | None = None,
+        passphrase: str | None = None,
         ssh_extra_kwargs: dict[str, Any] | None = None,
     ) -> "WGClient":
         ssh = paramiko.SSHClient()
@@ -32,6 +34,7 @@ class WGClient:
             port=port,
             username=username,
             key_filename=key_filename,
+            passphrase=passphrase,
             **(ssh_extra_kwargs or {}),
         )
         return cls(ssh)
@@ -43,24 +46,24 @@ class WGClient:
         port: int,
         username: str,
         key_filename: str | None = None,
-        ssh_extra_kwargs: dict[str, Any] | None = None,
+        passphrase: str | None = None,
     ) -> bool:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(
-                hostname=host,
+            client = cls.with_ssh(
+                host=host,
                 port=port,
                 username=username,
                 key_filename=key_filename,
-                timeout=5,
-                **(ssh_extra_kwargs or {}),
+                passphrase=passphrase,
             )
+            client.ssh_client.close()
             return True
-        except (paramiko.AuthenticationException, paramiko.SSHException, socket.error):
+        except (
+            paramiko.AuthenticationException,
+            paramiko.SSHException,
+            socket.error,
+        ) as e:
             return False
-        finally:
-            ssh.close()
 
     def exec(self, command: WGCommand) -> tuple[str, str]:
         return command.execute(self.ssh_client)
@@ -76,7 +79,7 @@ class WGClient:
         latest_handshakes: bool = False,
     ) -> Interface:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.show.Show(
+            command=_commands.modules.show.Show(
                 "show",
                 interface=interface,
                 public_key=public_key,
@@ -92,26 +95,19 @@ class WGClient:
 
     def save_changes(self, interface: str = "all") -> tuple[str, str]:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.save.WGQuickSave(
-                interface
-            )
+            command=_commands.modules.save.WGQuickSave(interface)
         )
         return stdout, stderr
 
     def generate_private_key(self) -> str:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
-                "genkey"
-            )
+            command=_commands.modules.generate_key.Genkey("genkey")
         )
         return stdout.removesuffix("\n")
 
     def generate_public_key(self, private_key: str) -> str:
         stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
-                "pubkey"
-            ),
-            stdin=private_key,
+            command=_commands.modules.generate_key.Genkey("pubkey", stdin=private_key),
         )
         if stderr:
             raise RuntimeError(f"WG command failed: {stderr.strip()}")
@@ -121,20 +117,8 @@ class WGClient:
         """
         Returns: (private_key, public_key)
         """
-        # 1. private key
         private_key = self.generate_private_key()
-
-        # 2. public key from private
-        stdout, stderr = self.exec(
-            command=wireguard_service.infrastructure.wg_client._commands.modules.generate_key.Genkey(
-                "pubkey",
-                stdin=private_key,
-            )
-        )
-        if stderr:
-            raise RuntimeError(f"wg pubkey failed: {stderr.strip()}")
-
-        public_key = stdout.strip()
+        public_key = self.generate_public_key(private_key)
 
         return private_key, public_key
 

@@ -78,6 +78,7 @@ def camel_case_to_snake_case(input_str: str) -> str:
 
 def render_client_config(
     server: ServerRead,
+    server_listening_port: int,
     client_private_key: str,
     client_address: str,
 ) -> str:
@@ -86,7 +87,7 @@ def render_client_config(
         "client_private_key": client_private_key,
         "client_address": client_address,
         "server_public_key": server.public_key,
-        "server_address": f"{server.host}:{server.port}",
+        "server_address": f"{server.host}:{server_listening_port}",
     }
     client_config = template.render(context)
     return client_config
