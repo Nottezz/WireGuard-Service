@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class PeerBase(BaseModel):
     endpoint: str | None = None
-    allowed_ips: list[str]
+    allowed_ips: list[str] | None = None
 
 
 class Peer(PeerBase):
